@@ -1,14 +1,57 @@
-# depot/push-action
+# `depot/push-action`
 
-Push images to a remote registry.
+This action pushes images from the Depot registry to another destination registry. It's intended to be used with `save: true` in the [depot/build-push-action](https://github.com/depot/build-push-action).
 
-Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/depot/push-action](https://github.com/depot/push-action).
+## Usage
 
-## Versions
+Push an image to a remote registry:
 
-| Version | Tag | Upstream commit |
-|---------|-----|-----------------|
-| v1.1.1 | [`v1.1.1`](https://github.com/chainguard-actions/depot-push-action/tree/v1.1.1) | [`c8cad89`](https://github.com/depot/push-action/commit/c8cad894ad7f4599b30c3b5e82b1ca4fae9ae8f9) |
+```yaml
+jobs:
+  job-name:
+    steps:
+      - uses: depot/setup-action@v1
+      - uses: depot/build-push-action@v1
+        id: build
+        with:
+          save: true
+      - uses: depot/push-action@v1
+        with:
+          build-id: ${{ steps.build.outputs.build-id }}
+          tags: |
+            org/repo:tag
+```
+
+Push a specific bake target to a remote registry:
+
+```yaml
+jobs:
+  job-name:
+    steps:
+      - uses: depot/setup-action@v1
+      - uses: depot/bake-action@v1
+        with:
+          save: true
+      - uses: depot/push-action@v1
+        with:
+          build-id: ${{ steps.build.outputs.build-id }}
+          tags: |
+            org/repo:tag
+          target: target-name
+```
+
+## Inputs
+
+| Name       | Type     | Required | Description                                                                                                |
+| ---------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `build-id` | string   | **yes**  | The build ID to pull images for.                                                                           |
+| `tags`     | list/CSV | no       | A list of tags to apply to the pushed image.                                                               |
+| `target`   | string   | no       | Select which bake target to push.                                                                          |
+| `token`    | string   | no       | The API token to use for authentication. This can be overridden by the `DEPOT_TOKEN` environment variable. |
+
+## License
+
+MIT License, see `LICENSE`.
 
 ## Privacy
 
